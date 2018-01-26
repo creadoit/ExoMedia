@@ -188,7 +188,11 @@ public class ExoMediaPlayer extends Player.DefaultEventListener {
     }
 
     public void setUri(@Nullable Uri uri) {
-        setMediaSource(uri != null ? mediaSourceProvider.generate(context, mainHandler, uri, bandwidthMeter) : null);
+        setMediaSource(getMediaSource(uri));
+    }
+
+    public MediaSource getMediaSource(@Nullable Uri uri){
+        return (uri != null ? mediaSourceProvider.generate(context, mainHandler, uri, bandwidthMeter) : null);
     }
 
     public void setMediaSource(@Nullable MediaSource source) {
