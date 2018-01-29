@@ -45,6 +45,7 @@ import com.devbrackets.android.exomedia.R;
 import com.devbrackets.android.exomedia.core.ListenerMux;
 import com.devbrackets.android.exomedia.core.api.VideoViewApi;
 import com.devbrackets.android.exomedia.core.exoplayer.ExoMediaPlayer;
+import com.devbrackets.android.exomedia.core.listener.ExoPlayerListener;
 import com.devbrackets.android.exomedia.core.listener.MetadataListener;
 import com.devbrackets.android.exomedia.core.video.exo.ExoTextureVideoView;
 import com.devbrackets.android.exomedia.core.video.mp.NativeTextureVideoView;
@@ -58,6 +59,7 @@ import com.devbrackets.android.exomedia.listener.OnVideoSizeChangedListener;
 import com.devbrackets.android.exomedia.util.DeviceUtil;
 import com.devbrackets.android.exomedia.util.StopWatch;
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.drm.MediaDrmCallback;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
@@ -691,6 +693,10 @@ public class VideoView extends RelativeLayout {
      */
     public void setOnVideoSizedChangedListener(@Nullable OnVideoSizeChangedListener listener) {
         muxNotifier.videoSizeChangedListener = listener;
+    }
+
+    public void addExoPlayerListener(ExoPlayerListener exoPlayerListener){
+        videoViewImpl.addExoPlayerListener(exoPlayerListener);
     }
 
     /**

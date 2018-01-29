@@ -56,6 +56,7 @@ import com.google.android.exoplayer2.LoadControl;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Renderer;
+import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.decoder.DecoderCounters;
@@ -83,6 +84,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.FixedTrackSelection;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -190,6 +192,14 @@ public class ExoMediaPlayer extends Player.DefaultEventListener implements AdsMe
     }
 
     @Override
+    public void onPositionDiscontinuity(int reason) {
+        Log.d("ExoMediaPlayer", "onPositionDiscontinuity reason: " + reason + "; index: " + player.getCurrentWindowIndex() + "; adIndex: " + player.getCurrentAdGroupIndex());
+        for (ExoPlayerListener listener : listeners) {
+            listener.onPositionDiscontinuity(reason, player.getCurrentWindowIndex(), player.getCurrentAdGroupIndex());
+        }
+    }
+
+    @Override
     public void onPlayerStateChanged(boolean playWhenReady, int state) {
         reportPlayerState();
     }
@@ -277,6 +287,10 @@ public class ExoMediaPlayer extends Player.DefaultEventListener implements AdsMe
         if (listener != null) {
             listeners.remove(listener);
         }
+    }
+
+    public void addPlayerEventListener(Player.EventListener eventListener){
+        player.addListener(eventListener);
     }
 
     public void setBufferUpdateListener(@Nullable OnBufferUpdateListener listener) {

@@ -26,8 +26,10 @@ import android.view.ViewGroup;
 
 import com.devbrackets.android.exomedia.ExoMedia;
 import com.devbrackets.android.exomedia.core.ListenerMux;
+import com.devbrackets.android.exomedia.core.listener.ExoPlayerListener;
 import com.devbrackets.android.exomedia.core.video.scale.ScaleType;
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.drm.MediaDrmCallback;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
@@ -146,6 +148,8 @@ public interface VideoViewApi {
     void setOnTouchListener(View.OnTouchListener listener);
 
     void setListenerMux(ListenerMux listenerMux);
+
+    void addExoPlayerListener(ExoPlayerListener exoPlayerListener);
 
     void onVideoSizeChanged(int width, int height);
 }

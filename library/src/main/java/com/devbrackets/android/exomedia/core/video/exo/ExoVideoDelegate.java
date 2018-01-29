@@ -28,10 +28,12 @@ import android.view.ViewGroup;
 import com.devbrackets.android.exomedia.ExoMedia;
 import com.devbrackets.android.exomedia.core.ListenerMux;
 import com.devbrackets.android.exomedia.core.exoplayer.ExoMediaPlayer;
+import com.devbrackets.android.exomedia.core.listener.ExoPlayerListener;
 import com.devbrackets.android.exomedia.core.listener.MetadataListener;
 import com.devbrackets.android.exomedia.core.video.ClearableSurface;
 import com.devbrackets.android.exomedia.listener.OnBufferUpdateListener;
 import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.drm.MediaDrmCallback;
 import com.google.android.exoplayer2.ext.ima.ImaAdsLoader;
 import com.google.android.exoplayer2.metadata.Metadata;
@@ -215,6 +217,10 @@ public class ExoVideoDelegate {
 
         this.listenerMux = listenerMux;
         exoMediaPlayer.addListener(listenerMux);
+    }
+
+    public void addExoPlayerListener(ExoPlayerListener exoPlayerListener){
+        exoMediaPlayer.addListener(exoPlayerListener);
     }
 
     public void onSurfaceReady(Surface surface) {

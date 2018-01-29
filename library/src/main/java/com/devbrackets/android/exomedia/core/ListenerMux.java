@@ -106,6 +106,10 @@ public class ListenerMux implements ExoPlayerListener, MediaPlayer.OnPreparedLis
     }
 
     @Override
+    public void onPositionDiscontinuity(int reason, int currentWindowIndex, int currentAdGroupIndex) {
+    }
+
+    @Override
     public void onError(ExoMediaPlayer exoMediaPlayer, Exception e) {
         muxNotifier.onMediaPlaybackEnded();
         muxNotifier.onExoPlayerError(exoMediaPlayer, e);

@@ -29,4 +29,6 @@ public interface ExoPlayerListener extends OnSeekCompletionListener {
     void onError(ExoMediaPlayer exoMediaPlayer, Exception e);
 
     void onVideoSizeChanged(int width, int height, int unAppliedRotationDegrees, float pixelWidthHeightRatio);
+
+    void onPositionDiscontinuity(int reason, int currentWindowIndex, int currentAdGroupIndex);
 }
