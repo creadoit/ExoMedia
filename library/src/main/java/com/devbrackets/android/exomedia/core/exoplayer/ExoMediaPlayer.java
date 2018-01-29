@@ -29,8 +29,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Size;
 import android.support.v4.util.ArrayMap;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
+import android.view.ViewGroup;
 
 import com.devbrackets.android.exomedia.ExoMedia;
 import com.devbrackets.android.exomedia.ExoMedia.RendererType;
@@ -42,6 +44,8 @@ import com.devbrackets.android.exomedia.core.renderer.RendererProvider;
 import com.devbrackets.android.exomedia.core.source.MediaSourceProvider;
 import com.devbrackets.android.exomedia.listener.OnBufferUpdateListener;
 import com.devbrackets.android.exomedia.util.Repeater;
+import com.google.ads.interactivemedia.v3.api.ImaSdkSettings;
+import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -61,10 +65,17 @@ import com.google.android.exoplayer2.drm.ExoMediaDrm;
 import com.google.android.exoplayer2.drm.FrameworkMediaCrypto;
 import com.google.android.exoplayer2.drm.FrameworkMediaDrm;
 import com.google.android.exoplayer2.drm.MediaDrmCallback;
+import com.google.android.exoplayer2.ext.ima.ImaAdsLoader;
 import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.metadata.MetadataOutput;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.MediaSourceEventListener;
 import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.source.ads.AdsMediaSource;
+import com.google.android.exoplayer2.source.dash.DashMediaSource;
+import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.text.TextOutput;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
@@ -72,7 +83,9 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.FixedTrackSelection;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
 
@@ -85,7 +98,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class ExoMediaPlayer extends Player.DefaultEventListener {
+public class ExoMediaPlayer extends Player.DefaultEventListener implements AdsMediaSource.MediaSourceFactory {
     private static final String TAG = "ExoMediaPlayer";
     private static final int BUFFER_REPEAT_DELAY = 1_000;
     private static final int WAKE_LOCK_TIMEOUT = 1_000;
@@ -141,6 +154,10 @@ public class ExoMediaPlayer extends Player.DefaultEventListener {
     private CapabilitiesListener capabilitiesListener = new CapabilitiesListener();
     private int audioSessionId = C.AUDIO_SESSION_ID_UNSET;
 
+    private ImaAdsLoader adsLoader;
+    private final DataSource.Factory manifestDataSourceFactory;
+    private final DataSource.Factory mediaDataSourceFactory;
+
     public ExoMediaPlayer(@NonNull Context context) {
         this.context = context;
 
@@ -161,6 +178,15 @@ public class ExoMediaPlayer extends Player.DefaultEventListener {
         LoadControl loadControl = ExoMedia.Data.loadControl != null ? ExoMedia.Data.loadControl : new DefaultLoadControl();
         player = ExoPlayerFactory.newInstance(renderers.toArray(new Renderer[renderers.size()]), trackSelector, loadControl);
         player.addListener(this);
+
+        manifestDataSourceFactory =
+                new DefaultDataSourceFactory(
+                        context, Util.getUserAgent(context, "Telekom Sport Suite"));
+        mediaDataSourceFactory =
+                new DefaultDataSourceFactory(
+                        context,
+                        Util.getUserAgent(context, "Telekom Sport Suite"),
+                        bandwidthMeter);
     }
 
     @Override
@@ -185,6 +211,45 @@ public class ExoMediaPlayer extends Player.DefaultEventListener {
      */
     public void setDrmCallback(@Nullable MediaDrmCallback drmCallback) {
         this.drmCallback = drmCallback;
+    }
+
+    public void setUri(@Nullable Uri uri, @Nullable String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback) {
+
+        if(!TextUtils.isEmpty(vmap) && adViewGroup != null) {
+            if (adsLoader != null) {
+                adsLoader.release();
+            }
+            ImaSdkSettings imaSdkSettings = new ImaSdkSettings();
+//            imaSdkSettings.setDebugMode(false);
+//            imaSdkSettings.setMaxRedirects(2);
+            imaSdkSettings.setLanguage("de");
+
+            adsLoader = new ImaAdsLoader.Builder(context)
+                    .setImaSdkSettings(imaSdkSettings)
+                    .buildForAdsResponse(vmap);
+            if(videoAdPlayerCallback != null){
+                adsLoader.addCallback(videoAdPlayerCallback);
+            }
+
+            MediaSource contentMediaSource = getMediaSource(uri);
+
+            MediaSource mediaSourceWithAds = new AdsMediaSource(
+                    contentMediaSource,
+                    this,
+                    adsLoader,
+                    adViewGroup,
+                    null, null);
+
+            setMediaSource(mediaSourceWithAds);
+        }else{
+            setUri(uri);
+        }
+    }
+
+    public void stopAd(){
+        if(adsLoader != null){
+            adsLoader.stopAd();
+        }
     }
 
     public void setUri(@Nullable Uri uri) {
@@ -429,6 +494,10 @@ public class ExoMediaPlayer extends Player.DefaultEventListener {
 
     public boolean getPlayWhenReady() {
         return player.getPlayWhenReady();
+    }
+
+    public boolean isAdPlaying() {
+        return player.isPlayingAd();
     }
 
     /**
@@ -790,5 +859,31 @@ public class ExoMediaPlayer extends Player.DefaultEventListener {
                 captionListener.onCues(cues);
             }
         }
+    }
+
+    @Override
+    public MediaSource createMediaSource(Uri uri, @Nullable Handler handler, @Nullable MediaSourceEventListener listener) {
+        @C.ContentType int type = Util.inferContentType(uri);
+        switch (type) {
+            case C.TYPE_DASH:
+                return new DashMediaSource.Factory(
+                        new DefaultDashChunkSource.Factory(mediaDataSourceFactory),
+                        manifestDataSourceFactory)
+                        .createMediaSource(uri, handler, listener);
+            case C.TYPE_HLS:
+                return new HlsMediaSource.Factory(mediaDataSourceFactory)
+                        .createMediaSource(uri, handler, listener);
+            case C.TYPE_OTHER:
+                return new ExtractorMediaSource.Factory(mediaDataSourceFactory)
+                        .createMediaSource(uri, handler, listener);
+            case C.TYPE_SS:
+            default:
+                throw new IllegalStateException("Unsupported type: " + type);
+        }
+    }
+
+    @Override
+    public int[] getSupportedTypes() {
+        return new int[]{C.TYPE_DASH, C.TYPE_HLS, C.TYPE_OTHER};
     }
 }

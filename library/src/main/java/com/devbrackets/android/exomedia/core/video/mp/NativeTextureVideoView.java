@@ -28,12 +28,14 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.Surface;
+import android.view.ViewGroup;
 import android.widget.MediaController;
 
 import com.devbrackets.android.exomedia.ExoMedia;
 import com.devbrackets.android.exomedia.core.ListenerMux;
 import com.devbrackets.android.exomedia.core.api.VideoViewApi;
 import com.devbrackets.android.exomedia.core.video.ResizingTextureView;
+import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
 import com.google.android.exoplayer2.drm.MediaDrmCallback;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
@@ -115,6 +117,15 @@ public class NativeTextureVideoView extends ResizingTextureView implements Nativ
     }
 
     @Override
+    public boolean isAdPlaying() {
+        return false;
+    }
+
+    @Override
+    public void stopAd() {
+    }
+
+    @Override
     public void videoSizeChanged(int width, int height) {
         if (updateVideoSize(width, height)) {
             requestLayout();
@@ -140,6 +151,11 @@ public class NativeTextureVideoView extends ResizingTextureView implements Nativ
     @Override
     public void setVideoUri(@Nullable Uri uri) {
         setVideoUri(uri, null);
+    }
+
+    @Override
+    public void setVideoUri(@Nullable Uri uri, String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback) {
+        setVideoUri(uri);
     }
 
     @Override

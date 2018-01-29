@@ -23,6 +23,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.Surface;
+import android.view.ViewGroup;
 
 import com.devbrackets.android.exomedia.ExoMedia;
 import com.devbrackets.android.exomedia.core.ListenerMux;
@@ -30,7 +31,9 @@ import com.devbrackets.android.exomedia.core.exoplayer.ExoMediaPlayer;
 import com.devbrackets.android.exomedia.core.listener.MetadataListener;
 import com.devbrackets.android.exomedia.core.video.ClearableSurface;
 import com.devbrackets.android.exomedia.listener.OnBufferUpdateListener;
+import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
 import com.google.android.exoplayer2.drm.MediaDrmCallback;
+import com.google.android.exoplayer2.ext.ima.ImaAdsLoader;
 import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
@@ -54,6 +57,19 @@ public class ExoVideoDelegate {
         this.clearableSurface = clearableSurface;
 
         setup();
+    }
+
+    public void setVideoUri(@Nullable Uri uri, @Nullable String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback) {
+        //Makes sure the listeners get the onPrepared callback
+        listenerMux.setNotifiedPrepared(false);
+        exoMediaPlayer.seekTo(0);
+
+        if (uri != null) {
+            exoMediaPlayer.setUri(uri, vmap, adViewGroup, videoAdPlayerCallback);
+            listenerMux.setNotifiedCompleted(false);
+        } else {
+            exoMediaPlayer.setMediaSource(null);
+        }
     }
 
     public void setVideoUri(@Nullable Uri uri) {
@@ -111,6 +127,14 @@ public class ExoVideoDelegate {
 
     public boolean isPlaying() {
         return exoMediaPlayer.getPlayWhenReady();
+    }
+
+    public boolean isAdPlaying() {
+        return exoMediaPlayer.isAdPlaying();
+    }
+
+    public void stopAd() {
+        exoMediaPlayer.stopAd();
     }
 
     public void start() {

@@ -35,6 +35,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -56,6 +57,7 @@ import com.devbrackets.android.exomedia.listener.OnSeekCompletionListener;
 import com.devbrackets.android.exomedia.listener.OnVideoSizeChangedListener;
 import com.devbrackets.android.exomedia.util.DeviceUtil;
 import com.devbrackets.android.exomedia.util.StopWatch;
+import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
 import com.google.android.exoplayer2.drm.MediaDrmCallback;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
@@ -271,6 +273,19 @@ public class VideoView extends RelativeLayout {
         if (videoControls != null) {
             videoControls.showLoading(true);
         }
+    }
+
+    public void setVideoURI(@Nullable Uri uri, String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback) {
+        videoUri = uri;
+        videoViewImpl.setVideoUri(uri, vmap, adViewGroup, videoAdPlayerCallback);
+
+        if (videoControls != null) {
+            videoControls.showLoading(true);
+        }
+    }
+
+    public void stopAd() {
+        videoViewImpl.stopAd();
     }
 
     /**
