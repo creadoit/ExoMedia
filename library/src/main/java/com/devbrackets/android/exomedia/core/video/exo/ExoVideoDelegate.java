@@ -61,13 +61,13 @@ public class ExoVideoDelegate {
         setup();
     }
 
-    public void setVideoUri(@Nullable Uri uri, @Nullable String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback) {
+    public void setVideoUri(@Nullable Uri uri, @Nullable String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback, @Nullable String overlayLangCode) {
         //Makes sure the listeners get the onPrepared callback
         listenerMux.setNotifiedPrepared(false);
         exoMediaPlayer.seekTo(0);
 
         if (uri != null) {
-            exoMediaPlayer.setUri(uri, vmap, adViewGroup, videoAdPlayerCallback);
+            exoMediaPlayer.setUri(uri, vmap, adViewGroup, videoAdPlayerCallback, overlayLangCode);
             listenerMux.setNotifiedCompleted(false);
         } else {
             exoMediaPlayer.setMediaSource(null);

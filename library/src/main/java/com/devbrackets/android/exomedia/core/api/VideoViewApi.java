@@ -56,7 +56,7 @@ public interface VideoViewApi {
 
     void setVideoUri(@Nullable Uri uri, @Nullable MediaSource mediaSource);
 
-    void setVideoUri(@Nullable Uri uri, String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback);
+    void setVideoUri(@Nullable Uri uri, String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback, @Nullable String overlayLangCode);
 
     boolean isAdPlaying();
 

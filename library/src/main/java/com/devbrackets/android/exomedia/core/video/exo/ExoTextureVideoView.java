@@ -75,8 +75,8 @@ public class ExoTextureVideoView extends ResizingTextureView implements VideoVie
     }
 
     @Override
-    public void setVideoUri(@Nullable Uri uri, String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback) {
-        delegate.setVideoUri(uri, vmap, adViewGroup, videoAdPlayerCallback);
+    public void setVideoUri(@Nullable Uri uri, String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback, @Nullable String overlayLangCode) {
+        delegate.setVideoUri(uri, vmap, adViewGroup, videoAdPlayerCallback, overlayLangCode);
     }
 
     @Override

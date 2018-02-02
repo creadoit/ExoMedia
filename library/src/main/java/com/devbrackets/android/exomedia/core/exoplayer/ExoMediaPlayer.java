@@ -181,19 +181,16 @@ public class ExoMediaPlayer extends Player.DefaultEventListener implements AdsMe
         player = ExoPlayerFactory.newInstance(renderers.toArray(new Renderer[renderers.size()]), trackSelector, loadControl);
         player.addListener(this);
 
-        manifestDataSourceFactory =
-                new DefaultDataSourceFactory(
-                        context, Util.getUserAgent(context, "Telekom Sport Suite"));
-        mediaDataSourceFactory =
-                new DefaultDataSourceFactory(
+        manifestDataSourceFactory = new DefaultDataSourceFactory(
+                        context, Util.getUserAgent(context, TAG));
+        mediaDataSourceFactory = new DefaultDataSourceFactory(
                         context,
-                        Util.getUserAgent(context, "Telekom Sport Suite"),
+                        Util.getUserAgent(context, TAG),
                         bandwidthMeter);
     }
 
     @Override
     public void onPositionDiscontinuity(int reason) {
-        Log.d("ExoMediaPlayer", "onPositionDiscontinuity reason: " + reason + "; index: " + player.getCurrentWindowIndex() + "; adIndex: " + player.getCurrentAdGroupIndex());
         for (ExoPlayerListener listener : listeners) {
             listener.onPositionDiscontinuity(reason, player.getCurrentWindowIndex(), player.getCurrentAdGroupIndex());
         }
@@ -223,7 +220,7 @@ public class ExoMediaPlayer extends Player.DefaultEventListener implements AdsMe
         this.drmCallback = drmCallback;
     }
 
-    public void setUri(@Nullable Uri uri, @Nullable String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback) {
+    public void setUri(@Nullable Uri uri, @Nullable String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback, @Nullable String overlayLangCode) {
 
         if(!TextUtils.isEmpty(vmap) && adViewGroup != null) {
             if (adsLoader != null) {
@@ -232,7 +229,9 @@ public class ExoMediaPlayer extends Player.DefaultEventListener implements AdsMe
             ImaSdkSettings imaSdkSettings = new ImaSdkSettings();
 //            imaSdkSettings.setDebugMode(false);
 //            imaSdkSettings.setMaxRedirects(2);
-            imaSdkSettings.setLanguage("de");
+            if(!TextUtils.isEmpty(overlayLangCode)) {
+                imaSdkSettings.setLanguage(overlayLangCode);
+            }
 
             adsLoader = new ImaAdsLoader.Builder(context)
                     .setImaSdkSettings(imaSdkSettings)

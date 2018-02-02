@@ -156,7 +156,7 @@ public class NativeTextureVideoView extends ResizingTextureView implements Nativ
     }
 
     @Override
-    public void setVideoUri(@Nullable Uri uri, String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback) {
+    public void setVideoUri(@Nullable Uri uri, String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback, @Nullable String overlayLangCode) {
         setVideoUri(uri);
     }
 

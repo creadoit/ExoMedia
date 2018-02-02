@@ -277,9 +277,9 @@ public class VideoView extends RelativeLayout {
         }
     }
 
-    public void setVideoURI(@Nullable Uri uri, String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback) {
+    public void setVideoURI(@Nullable Uri uri, String vmap, ViewGroup adViewGroup, @Nullable VideoAdPlayer.VideoAdPlayerCallback videoAdPlayerCallback, @Nullable String overlayLangCode) {
         videoUri = uri;
-        videoViewImpl.setVideoUri(uri, vmap, adViewGroup, videoAdPlayerCallback);
+        videoViewImpl.setVideoUri(uri, vmap, adViewGroup, videoAdPlayerCallback, overlayLangCode);
 
         if (videoControls != null) {
             videoControls.showLoading(true);
