@@ -11,7 +11,7 @@ def libraryVersion = "${versionMajor}.${versionMinor}.${versionPatch}"
 
 
 ext {
-    exoPlayerVersion = "2.6.1"
+    exoPlayerVersion = "2.7.3"
     supportLibVersion = "27.0.0"
 }
 
